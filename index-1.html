@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>הוצאות הבית</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<meta name="theme-color" content="#0E6B66">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#EEF1F4;--cd:#fff;--ink:#16202E;--mu:#677485;--ln:#DCE2E9;--ac:#0E6B66;--ng:#B4432F;--ps:#17724A;--br:#CBE5E2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161D;--cd:#18212B;--ink:#E7ECF2;--mu:#93A0B0;--ln:#27323E;--ac:#4FC3BA;--ng:#F08A74;--ps:#5FD39A;--br:#1F3C3B}}
+:root[data-theme="dark"]{--bg:#10161D;--cd:#18212B;--ink:#E7ECF2;--mu:#93A0B0;--ln:#27323E;--ac:#4FC3BA;--ng:#F08A74;--ps:#5FD39A;--br:#1F3C3B}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Heebo,system-ui,sans-serif;padding-bottom:84px}
+#mn{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:center;gap:18px;padding:12px;font-size:19px;font-weight:800}
+#mn button{font-size:26px;width:44px;height:44px;border:0;background:var(--cd);color:var(--ink);border-radius:50%}
+#app{padding:0 12px;max-width:560px;margin:0 auto}
+.card{background:var(--cd);border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--ln)}
+.lbl,small,.mt{color:var(--mu);font-size:13px}
+.big{font-size:40px;font-weight:800;line-height:1.1;margin:2px 0 8px}
+.neg{color:var(--ng)}.pos{color:var(--ps)}
+.two{display:flex;justify-content:space-between;color:var(--mu)}.two b{color:var(--ink)}
+.row{padding:10px 0;border-top:1px solid var(--ln)}.row:first-child{border-top:0}
+.rt{display:flex;justify-content:space-between;font-weight:600}
+.bar{height:6px;background:var(--ln);border-radius:3px;margin:6px 0 3px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
+.tx{display:flex;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--ln)}.tx:first-child{border-top:0}
+.tl{flex:1;min-width:0}.nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx select{max-width:120px}
+select,input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:9px;width:100%}
+label{display:block;margin-bottom:12px;color:var(--mu);font-size:14px}label input,label select{margin-top:4px}
+.del{border:0;background:none;color:var(--mu);font-size:15px;min-width:36px;height:36px}
+.chip{border:1px solid var(--ac);color:var(--ac);background:none;border-radius:20px;padding:6px 14px;margin-bottom:10px;font:inherit}
+.pri{display:block;width:100%;text-align:center;border:0;background:var(--ac);color:var(--bg);border-radius:12px;padding:13px;font:600 16px Heebo,sans-serif;margin-top:6px}
+.seg{display:flex;gap:6px;margin-bottom:12px}.seg button{flex:1;padding:10px;border:1px solid var(--ln);background:none;color:var(--ink);border-radius:10px;font:inherit}.seg .on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+.empty{text-align:center;color:var(--mu);padding:30px 10px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--cd);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:none;color:var(--mu);padding:14px 4px;font:600 14px Heebo,sans-serif}nav .on{color:var(--ac)}
+#t{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:20px;display:none;z-index:9;max-width:90%}
+h3{margin:0 0 8px;font-size:16px}p{margin:6px 0}
+:root{--wn:#B45309}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--wn:#F5B35A}}:root[data-theme="dark"]{--wn:#F5B35A}
+.wn{color:var(--wn);font-weight:600}.bar{position:relative;overflow:visible}.bar i{border-radius:3px}.mk{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);border-radius:1px}.cg{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+</style>
+</head>
+<body>
+<div id="mn"></div><div id="app"></div><div id="t"></div>
+<nav id="nv"></nav>
+<script>
+const CATS=['מזון ופארמה','פנאי, בילויים, תחביבים','ביגוד והנעלה ותספורות','תכולת בית','אחזקת בית','אוכל בחוץ','חינוך\\לימודים','מתנות','בריאות','מוסכים+אגרה+דוחות','דלק+חניה','חשמל','מים','דיור','תרומות','דת','ביטוחים','אחר'];
+const KW=[['ביטוחים',/ביטוח|הראל|מגדל|הפניקס|מנורה|שומרה|הכשרה/],['מוסכים+אגרה+דוחות',/מוסך|רישוי|אגרה|דו"ח|צמיג|טסט|משטרת/],['דלק+חניה',/פז |סונול|דלק|דור אלון|חני|אחוזות החוף|פנגו|pango|כביש 6|רב.?קו|תחבורה/i],['אוכל בחוץ',/מסעדה|קפה|ארומה|וולט|wolt|תן ביס|פיצה|בורגר|סושי|פלאפל|שווארמה|גלידה|מקדונלד|דומינו/i],['מזון ופארמה',/שופרסל|רמי לוי|יוחננוף|ויקטורי|מגה|טיב טעם|אושר עד|סופר|פארם|מכולת|מינימרקט|am:?pm|ירקות|מאפי|מזון/i],['בריאות',/מכבי|כללית|מאוחדת|לאומית|מרקחת|רופא|שיניים|רפוא|קליניקה|מרפאה|בריאות|אופטיק/],['ביגוד והנעלה ותספורות',/זארה|zara|קסטרו|פוקס|h&m|הוניגמן|גולף|אופנה|הנעלה|נעליים|ביגוד|מספרה|תספורת|shein|שיין|טרמינל/i],['חשמל',/חברת החשמל/],['מים',/תאגיד מים|מקורות|הגיחון|מי אביבים|מי שבע/],['דיור',/ארנונה|שכירות|ועד בית/],['חינוך\\לימודים',/אוניברסיטה|מכללה|בית ספר|גן ילדים|חוג|קורס|חינוך|סטימצקי/],['תרומות',/תרומה|עמותה|צדקה/],['דת',/בית כנסת|סת"ם|ישיבה|מקווה|יודאיקה/],['מתנות',/מתנה|פרחים|גיפט|בלונים/],['תכולת בית',/איקאה|ikea|אייס|הום סנטר|זול סטוק|מחסני חשמל|רהיט|כלי בית/i],['אחזקת בית',/אינסטלטור|חשמלאי|שיפוץ|אחזקה|גז/],['פנאי, בילויים, תחביבים',/נטפליקס|netflix|spotify|ספוטיפיי|סינמה|קולנוע|הצגה|תיאטרון|בילוי|בידור|תרבות|ספורט|כושר/i]];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fm=n=>Math.round(n).toLocaleString('he-IL');
+const f2=n=>n.toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2});
+const ml=m=>new Date(+m.slice(0,4),+m.slice(5)-1,1).toLocaleDateString('he-IL',{month:'long',year:'numeric'});
+const key=n=>String(n).trim().replace(/\s+/g,' ');
+const p2=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+const today=iso(new Date()),nowM=today.slice(0,7),SK='expenses_v1';
+let S,M,T='s',F=null,D=null,AT='e',R=0,IP=false,DP=null,Q='',AW=6,SK2=[];
+function load(){try{S=JSON.parse(localStorage.getItem(SK))}catch(e){}
+ if(!S||!S.tx){S={tx:[],rules:{},id:1};save()}}
+function save(){try{localStorage.setItem(SK,JSON.stringify(S))}catch(e){}}
+function toast(t){const e=$('#t');e.textContent=t;e.style.display='block';clearTimeout(R);R=setTimeout(()=>e.style.display='none',3500)}
+function months(){let a=S.tx.map(x=>x.m).sort();if(!a.length)a=[nowM];let [y,m]=a[0].split('-').map(Number);const e=a[a.length-1]>nowM?a[a.length-1]:nowM,o=[];for(;;){const k=y+'-'+p2(m);o.push(k);if(k>=e)break;if(++m>12){m=1;y++}}return o}
+function nav(d){const a=months(),i=a.indexOf(M)+d;if(a[i]){M=a[i];render()}}
+function tab(t){T=t;if(t==='l'){F=null;Q=''}D=null;render()}
+function go(i){F=i<0?'':CATS[i];T='l';Q='';render()}
+function guess(n,s){const k=key(n);if(S.rules[k]!==undefined)return S.rules[k];const t=n+' '+s;for(const [c,r] of KW)if(r.test(t))return c;return ''}
+function setCat(id,c){const x=S.tx.find(t=>t.id===id);if(!x)return;x.c=c;if(!x.h){S.rules[key(x.n)]=c;S.tx.forEach(t=>{if(!t.h&&t.t==='e'&&key(t.n)===key(x.n))t.c=c})}save();render()}
+function del(id){if(D===id){S.tx=S.tx.filter(x=>x.id!==id);D=null;save();render();toast('נמחק')}else{D=id;render()}}
+function nq(){const m={};S.tx.forEach(x=>{if(x.t==='e'&&!x.c&&!x.h){const k=key(x.n),o=m[k]=m[k]||{k,n:0,s:0};o.n++;o.s+=x.a}});return Object.values(m).filter(o=>!SK2.includes(o.k)).sort((a,b)=>b.s-a.s)}
+function vQ(){const q=nq();if(!q.length)return '<p class="empty">אין בתי עסק שמחכים לסיווג.</p>';const o=q[0];
+ return `<div class="card"><div class="lbl">${q.length} בתי עסק ממתינים. אזכור כל תשובה להבא.</div><h3 style="font-size:22px;margin-top:8px">${esc(o.k)}</h3><p>${o.n} עסקאות, סה"כ ${fm(o.s)} ₪. לאיזו קטגוריה זה שייך?</p><div class="cg">${CATS.map((c,i)=>`<button class="chip" onclick="ans(${i})">${esc(c)}</button>`).join('')}</div><button class="del" style="width:auto;padding:0 10px" onclick="SK2.push(nq()[0].k);after()">דלג כרגע</button></div>`}
+function ans(i){const o=nq()[0];S.rules[o.k]=CATS[i];S.tx.forEach(t=>{if(t.t==='e'&&!t.h&&key(t.n)===o.k)t.c=CATS[i]});save();after()}
+function after(){if(!nq().length){T='s';render();toast('סיימנו. אזכור את הבחירות להבא')}else render()}
+function xf(id){const x=S.tx.find(t=>t.id===id);if(x){x.x=x.x?0:1;save();render()}}
+function vS(){const by={},sm={};let tot=0,inc=0;
+ S.tx.forEach(x=>{if(x.t==='i'){if(x.m===M)inc+=x.a;return}if(x.m===M){by[x.c]=(by[x.c]||0)+x.a;tot+=x.a}if(!x.x){const o=sm[x.m]=sm[x.m]||{};o[x.c]=(o[x.c]||0)+x.a}});
+ const ms=months(),i=ms.indexOf(M),bs=ms.slice(AW?Math.max(0,i-AW):0,i),avg=c=>bs.length?bs.reduce((a,m)=>a+((sm[m]||{})[c]||0),0)/bs.length:0;
+ const cs=by['']?CATS.concat(['']):CATS,mx=Math.max(1,...cs.map(c=>Math.max(Math.abs(by[c]||0),avg(c)))),bal=inc-tot,q=nq().length;
+ return (q?`<button class="chip" onclick="tab('q')">${q} בתי עסק מחכים לסיווג</button>`:'')+`<div class="card"><div class="lbl">הכנסות פחות הוצאות</div><div class="big ${bal<0?'neg':'pos'}">${fm(bal)} ₪</div><div class="two"><span>הכנסות <b>${fm(inc)} ₪</b></span><span>הוצאות <b>${fm(tot)} ₪</b></span></div></div>
+<p class="lbl">הקו בכל פס הוא הממוצע (${AW?AW+' החודשים שלפני החודש הזה':'כל החודשים שלפניו'}, בלי הוצאות חריגות). ${M===nowM?'החודש עוד לא נגמר, ההשוואה חלקית. ':''}<button class="chip" onclick="AW=AW?0:6;render()">שינוי תקופה</button></p><div class="card">`+
+ cs.map(c=>{const a=by[c]||0,v=avg(c),p=v>0?(a-v)/v*100:0;return `<div class="row" onclick="go(${CATS.indexOf(c)})"><div class="rt"><span>${esc(c||'ללא סיווג')}</span><b>${a?fm(a)+' ₪':'–'}</b></div><div class="bar"><i style="width:${Math.abs(a)/mx*100}%${p>25?';background:var(--wn)':''}"></i>${v?`<span class="mk" style="right:${v/mx*100}%"></span>`:''}</div><small>${v?'ממוצע '+fm(v)+' ₪'+(a?` · <span class="${p>25?'wn':p<-10?'pos':''}">${p>0?'+':''}${Math.round(p)}%</span>`:''):'אין עדיין ממוצע'}</small></div>`}).join('')+'</div>'}
+function vL(){const un=S.tx.filter(x=>x.m===M&&x.t==='e'&&!x.c).length;
+ let h=`<input id="q" placeholder="חיפוש בכל העסקאות" value="${esc(Q)}" oninput="Q=this.value;rl()" style="margin-bottom:10px">`;
+ if(F!==null)h+=`<button class="chip" onclick="F=null;render()">${esc(F||'ללא סיווג')} ✕</button>`;else if(un)h+=`<button class="chip" onclick="tab('q')">${un} עסקאות ללא סיווג, לענות</button>`;
+ return h+'<div id="lr">'+vr()+'</div>'}
+function rl(){$('#lr').innerHTML=vr()}
+function vr(){const q=Q.trim().toLowerCase(),L=S.tx.filter(x=>q?key(x.n).toLowerCase().includes(q):x.m===M&&(F===null||(x.t==='e'&&x.c===F))).sort((a,b)=>b.d.localeCompare(a.d)||b.id-a.id);
+ if(!L.length)return '<p class="empty">אין עסקאות להצגה.</p>';let h='';
+ if(q)h+=`<div class="card"><b>${L.length} עסקאות, סה"כ ${fm(L.filter(x=>x.t==='e').reduce((a,x)=>a+x.a,0))} ₪</b></div>`;
+ else if(F){const mm={};L.forEach(x=>{if(!x.h){const k=key(x.n);mm[k]=(mm[k]||0)+x.a}});const t=Object.entries(mm).sort((a,b)=>b[1]-a[1]).slice(0,5);if(t.length)h+=`<div class="card"><h3>בתי עסק מובילים</h3>${t.map(([k,a])=>`<div class="rt"><span>${esc(k)}</span><b>${fm(a)} ₪</b></div>`).join('')}</div>`}
+ return h+'<div class="card">'+L.map(x=>`<div class="tx"><div class="tl"><div class="nm">${esc(x.n)}</div><div class="mt">${x.h?'סיכום חודשי':'קנייה '+x.d.slice(8)+'/'+x.d.slice(5,7)}${q?' · '+x.m:''}${x.x?' · חריגה':''}</div></div>`+
+ (x.t==='i'?`<span class="pos">הכנסה</span>`:`<select onchange="setCat(${x.id},this.value)"><option value=""${x.c?'':' selected'}>בחר קטגוריה</option>${CATS.map(c=>`<option${c===x.c?' selected':''}>${esc(c)}</option>`).join('')}</select>`)+
+ `<b class="${x.t==='i'?'pos':''}">${f2(x.a)} ₪</b>${x.t==='e'?`<button class="del" onclick="xf(${x.id})">${x.x?'⚑':'⚐'}</button>`:''}<button class="del" onclick="del(${x.id})">${D===x.id?'למחוק?':'✕'}</button></div>`).join('')+'</div>'}
+function vA(){return `<div class="card"><div class="seg"><button class="${AT==='e'?'on':''}" onclick="AT='e';render()">הוצאה</button><button class="${AT==='i'?'on':''}" onclick="AT='i';render()">הכנסה</button></div>
+<label>סכום ב-₪ (מינוס להחזר)<input id="aa" type="number" inputmode="decimal" step="0.01"></label><label>תיאור<input id="an"></label>
+${AT==='e'?`<label>קטגוריה<select id="ac">${CATS.map(c=>`<option>${esc(c)}</option>`).join('')}</select></label>`:''}
+<label>חודש<input id="am" type="month" value="${M}"></label><button class="pri" onclick="addTx()">שמירה</button></div>`}
+function addTx(){const a=parseFloat($('#aa').value);if(!a)return toast('צריך להזין סכום');const m=$('#am').value||M,c=AT==='e'?$('#ac').value:'';
+ S.tx.push({id:S.id++,m,d:today.slice(0,7)===m?today:m+'-01',n:$('#an').value.trim()||(AT==='e'?c:'הכנסה'),a,c,t:AT});save();M=m;T='s';render();toast('נשמר')}
+function vF(){return `<div class="card"><h3>העלאת קובץ אשראי</h3><p class="lbl">כאל, מקס, ישראכארט (אקסל). החודש נלקח מתאריך החיוב בקובץ. אם אין בקובץ, ייכנס לחודש שנבחר כאן:</p><label>חודש חיוב<input id="bm" type="month" value="${nowM}"></label>
+<label class="pri" for="fi">בחירת קובץ</label><input type="file" id="fi" multiple style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none" onchange="up(this.files)"></div>
+<div class="card"><h3>גיבוי ושחזור</h3><p class="lbl">הנתונים נשמרים בדפדפן במכשיר הזה בלבד. כדאי לשמור גיבוי מדי פעם.${S.lb?' גיבוי אחרון: '+S.lb:''}</p>
+<button class="pri" onclick="bk()">שמירת גיבוי לקובץ</button>
+<label class="pri" style="background:none;border:1px solid var(--ac);color:var(--ac)">שחזור מגיבוי<input type="file" hidden accept=".json" onchange="rs(this.files[0])"></label></div>
+${IP?'<div class="card"><h3>התקנה כאפליקציה</h3><p class="lbl">הוספת האפליקציה למסך הבית, לפתיחה במסך מלא בלי סרגל דפדפן.</p><button class="pri" onclick="doIP()">התקנת האפליקציה</button></div>':''}`}
+const pdt=v=>{if(v instanceof Date)return new Date(v.getTime()+43200000);const m=String(v).match(/(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/);if(!m)return null;let y=+m[3];if(y<100)y+=2000;return new Date(y,m[2]-1,+m[1])};
+const num=v=>typeof v==='number'?v:parseFloat(String(v).replace(/[₪,\s]/g,''));
+const isH=r=>r.some(c=>/בית\s*ה?עסק/.test(c))&&r.some(c=>/סכום/.test(c));
+function cols(r){const H=r.map(c=>String(c).trim()),f=(re,no)=>H.findIndex(c=>re.test(c)&&!(no&&no.test(c))),A=f(/סכום חיוב/),D=f(/תאריך\s*(עסקה|רכישה)/);return{N:f(/בית\s*ה?עסק/),A:A>=0?A:f(/סכום/),D:D>=0?D:f(/תאריך/,/חיוב/),B:f(/(תאריך|מועד)\s*חיוב/),C:f(/ענף|קטגוריה/)}}
+async function up(fl){if(typeof XLSX==='undefined')return toast('רכיב קריאת האקסל לא נטען, בדוק חיבור לאינטרנט');
+ fl=[...fl];try{$('#fi').value=''}catch(e){}toast('קורא את הקובץ...');try{
+ let add=0,dup=0,un=0;const bm=$('#bm').value||nowM,seen={};
+ S.tx.forEach(x=>{if(!x.h&&x.t==='e'){const k=[x.d,key(x.n),x.a].join('|');seen[k]=(seen[k]||0)+1}});
+ for(const f of fl){let wb;try{wb=XLSX.read(new Uint8Array(await f.arrayBuffer()),{type:'array',cellDates:true})}catch(e){toast('לא הצלחתי לקרוא את '+f.name+': '+(e&&e.message||''));continue}
+  for(const sn of wb.SheetNames){let cl=null;
+   for(const r of XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:''})){
+    if(isH(r)){cl=cols(r);continue}if(!cl)continue;
+    const n=String(r[cl.N]||'').trim(),a=num(r[cl.A]);if(!n||isNaN(a)||/סה"כ|סך הכל/.test(n))continue;
+    const d=cl.D>=0?pdt(r[cl.D]):null,b=cl.B>=0?pdt(r[cl.B]):null,m=b?iso(b).slice(0,7):bm,ds=d?iso(d):m+'-01',k=[ds,key(n),a].join('|');
+    if(seen[k]>0){seen[k]--;dup++;continue}
+    const c=guess(n,cl.C>=0?String(r[cl.C]):'');if(!c)un++;
+    S.tx.push({id:S.id++,m,d:ds,n,a,c,t:'e'});add++;M=m}}}
+ if(!add&&!dup)return toast('לא נמצאו עסקאות בקובץ. שלח לי דוגמה ואתאים את הזיהוי');
+ save();SK2=[];Q='';T=un?'q':'s';F=null;render();toast(`נוספו ${add} עסקאות`+(dup?`, ${dup} כבר היו קיימות`:'')+(un?`, ${un} ללא סיווג`:''))}catch(e){toast('שגיאה: '+(e&&e.message||e))}}
+function bk(){try{const b=new Blob([JSON.stringify(S)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='expenses-backup-'+today+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);S.lb=today;save();render();toast('הגיבוי הורד לתיקיית ההורדות')}catch(e){toast('השמירה לא הצליחה')}}
+async function rs(f){if(!f)return;try{const o=JSON.parse(await f.text());if(!o||!Array.isArray(o.tx))throw 0;S=o;save();M=S.tx.map(x=>x.m).sort().pop()||nowM;T='s';render();toast('הנתונים שוחזרו')}catch(e){toast('הקובץ לא תקין')}}
+function render(){
+ $('#mn').innerHTML=(T==='s'||T==='l')?`<button onclick="nav(-1)">›</button><span>${ml(M)}</span><button onclick="nav(1)">‹</button>`:`<span>${{a:'הוספה ידנית',f:'קבצים וגיבוי',q:'סיווג בתי עסק'}[T]}</span>`;
+ $('#app').innerHTML={s:vS,l:vL,a:vA,f:vF,q:vQ}[T]();
+ $('#nv').innerHTML=[['s','סיכום'],['l','עסקאות'],['a','הוספה'],['f','קבצים']].map(([k,v])=>`<button class="${T===k?'on':''}" onclick="tab('${k}')">${v}</button>`).join('')}
+load();M=S.tx.map(x=>x.m).sort().pop()||nowM;render();
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();DP=e;IP=true;if(T==='f')render()});
+function doIP(){if(!DP)return;DP.prompt();DP=null;IP=false;render()}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
